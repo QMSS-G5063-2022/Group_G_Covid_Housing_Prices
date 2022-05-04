@@ -1,0 +1,305 @@
+---
+title: "DV Part 1"
+author: "Yi Hyun Kim"
+date: "4/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(readr)
+library(zoo)
+library(showtext)
+```
+
+```{r}
+sales <- read_csv("Sales_Price_Monthly.csv",
+                  col_names = TRUE,
+                  show_col_types = FALSE)
+covid <- read_csv("Covid_Monthly_Borough.csv",
+                  col_names = TRUE,
+                  show_col_types = FALSE)
+```
+
+```{r}
+sales_monthly <- sales %>%
+  group_by(Borough, Year, Month) %>%
+  summarize_each(funs(mean=mean(., na.rm=TRUE))) %>%
+  subset(., select = -c(Zipcode_mean))
+
+sales_monthly$`Average Sale Price` <- sales_monthly$`Average Sale Price_mean`
+
+sales_monthly$`Month & Year` <- as.yearmon(paste(sales_monthly$Month, sales_monthly$Year))
+sales_monthly <- sales_monthly[order(sales_monthly$`Month & Year`), ]
+
+covid$`Month & Year` <- as.yearmon(paste(covid$Month, covid$Year))
+covid <- covid[order(covid$`Month & Year`), ]
+```
+
+```{r}
+max(msales$`Average Sale Price_mean`)
+min(msales$`Average Sale Price_mean`)
+max(mcovid$Rate)
+min(mcovid$Rate)
+```
+
+```{r}
+font_add_google(family="Roboto", "Roboto Mono")
+showtext_auto()
+t <- list(
+  family = "Roboto"
+)
+```
+
+```{r}
+msales <- sales_monthly %>%
+  filter(Borough == "Manhattan")
+
+msales$`Average Sale Price` <- msales$`Average Sale Price`/1000
+
+mcovid <- covid %>%
+  filter(Borough == "Manhattan")
+
+scaleFactor <- max(msales$`Average Sale Price`)/max(mcovid$Rate)
+
+mplot <- ggplot() +
+  geom_bar(data = mcovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
+  geom_line(data = msales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  labs(title = "Manhattan Average Sales and Covid-19 Rate",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y.left = element_text(color="steelblue3"),
+        axis.title.y.right = element_text(color="tomato3"),
+        axis.text.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+mplot
+```
+
+```{r}
+brsales <- sales_monthly %>%
+  filter(Borough == "Bronx")
+
+brsales$`Average Sale Price` <- brsales$`Average Sale Price`/1000
+
+brcovid <- covid %>%
+  filter(Borough == "Bronx")
+
+scaleFactor <- max(brsales$`Average Sale Price`)/max(brcovid$Rate)
+
+brplot <- ggplot() +
+  geom_bar(data = brcovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
+  geom_line(data = brsales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  labs(title = "Bronx Average Sales and Covid-19 Rate",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y.left = element_text(color="steelblue3"),
+        axis.title.y.right = element_text(color="tomato3"),
+        axis.text.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+brplot
+```
+
+```{r}
+oosales <- sales_monthly %>%
+  filter(Borough == "Brooklyn")
+
+oosales$`Average Sale Price` <- oosales$`Average Sale Price`/1000
+
+oocovid <- covid %>%
+  filter(Borough == "Brooklyn")
+
+scaleFactor <- max(oosales$`Average Sale Price`)/max(oocovid$Rate)
+
+ooplot <- ggplot() +
+  geom_bar(data = oocovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
+  geom_line(data = oosales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  labs(title = "Brooklyn Average Sales and Covid-19 Rate",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y.left = element_text(color="steelblue3"),
+        axis.title.y.right = element_text(color="tomato3"),
+        axis.text.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+ooplot
+```
+
+```{r}
+qsales <- sales_monthly %>%
+  filter(Borough == "Queens")
+
+qsales$`Average Sale Price` <- qsales$`Average Sale Price`/1000
+
+qcovid <- covid %>%
+  filter(Borough == "Queens")
+
+scaleFactor <- max(qsales$`Average Sale Price`)/max(qcovid$Rate)
+
+qplot <- ggplot() +
+  geom_bar(data = qcovid, aes(x = `Month & Year`, y = Rate * scaleFactor),  stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
+  geom_line(data = qsales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  labs(title = "Queens Average Sales and Covid-19 Rate",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y.left = element_text(color="steelblue3"),
+        axis.title.y.right = element_text(color="tomato3"),
+        axis.text.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+qplot
+```
+
+```{r}
+ssales <- sales_monthly %>%
+  filter(Borough == "Staten Island")
+
+ssales$`Average Sale Price` <- ssales$`Average Sale Price`/1000
+
+scovid <- covid %>%
+  filter(Borough == "Staten Island")
+
+scaleFactor <- max(ssales$`Average Sale Price`)/max(scovid$Rate)
+
+splot <- ggplot() +
+  geom_bar(data = scovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
+  geom_line(data = ssales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  labs(title = "Staten Island Average Sales and Covid-19 Rate",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y.left = element_text(color="steelblue3"),
+        axis.title.y.right = element_text(color="tomato3"),
+        axis.text.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+splot
+```
+
+```{r}
+bsales <- sales_monthly %>%
+  group_by(Borough)
+
+bsales$`Average Sale Price` <- bsales$`Average Sale Price`/1000
+
+bcovid <- covid %>%
+  group_by(Borough)
+
+bcovid <- bcovid[!(bcovid$Borough == "City"), ]
+
+scaleFactor1 <- max(bsales$`Average Sale Price`)/max(bcovid$Rate)
+
+plots <- ggplot() +
+  geom_line(data = bsales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  geom_line(data = bcovid, aes(x = `Month & Year`, y = Rate * scaleFactor1), col = "tomato3") +
+  scale_x_yearmon() +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid Rate")) +
+  labs(title = "Average Sales and Covid-19 Rate in NYC",
+       subtitle = "For each Borough",
+       x = "Month") +
+  theme_minimal() +
+  theme(text = element_text(family = "mono"),
+        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+        plot.subtitle = element_text(face = "italic", hjust = 0.5),
+        axis.title = element_text(face = "bold", size = 10),
+        axis.title.y.left = element_text(color="steelblue3"),
+        axis.text.y = element_blank(),
+        axis.title.y.right = element_text(color="tomato3"),
+        legend.position = "none")
+plots <- plots + facet_grid(rows = vars(Borough), scales = "free")
+plots
+```
+
+```{r}
+library(plotly)
+library(DT)
+```
+
+```{r}
+sales_monthly1 <- subset(sales_monthly, select = -c(`Average Sale Price_mean`, `Month & Year`))
+
+salesdt<- datatable(sales_monthly1, options = list(pageLength = 5))
+salesdt
+
+covid1 <- subset(covid, select = -c(my:`Month & Year`))
+
+coviddt <- datatable(covid1, options = list(pageLength = 5))
+```
+
+```{r}
+interactive <- ggplotly(plots)
+interactive
+```
+
+```{r}
+manhattan <- ggplotly(mplot)
+manhattan
+```
+
+```{r}
+bronx <- ggplotly(brplot)
+bronx
+```
+
+```{r}
+brooklyn <- ggplotly(ooplot)
+brooklyn
+```
+
+```{r}
+queens <- ggplotly(qplot)
+queens
+```
+
+```{r}
+staten <- ggplotly(splot)
+staten
+```
+
+```{r}
+htmlwidgets::saveWidget(salesdt, "salesdt.html")
+htmlwidgets::saveWidget(coviddt, "coviddt.html")
+```
+
+```{r}
+htmlwidgets::saveWidget(interactive, "all5.html")
+```
+
+```{r}
+htmlwidgets::saveWidget(manhattan, "manhattan.html")
+htmlwidgets::saveWidget(bronx, "bronx.html")
+htmlwidgets::saveWidget(brooklyn, "brooklyn.html")
+htmlwidgets::saveWidget(queens, "queens.html")
+htmlwidgets::saveWidget(staten, "staten.html")
+```

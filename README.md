@@ -39,4 +39,4 @@ The final section studies the changes of perspective on Covid-19 over time (2020
 * Text Analysis: [Tweets](https://github.com/QMSS-G5063-2022/Group_G_Covid_Housing_Prices/tree/main/Part3_data)
 
 Our process book that logs our work from start to end can be found [here](https://docs.google.com/document/d/1xeExYWJWVvAeyePif__lbE5q5tvxCoxBYs8WfAIuTLs/edit?usp=sharing)
-- Note: this can only be viewed by LionMai
+- Note: this can only be viewed by LionMail.

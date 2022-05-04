@@ -7,7 +7,7 @@
 
 Click [here](https://2hyunie.github.io/qmss-dv-group-g/index.html) to view our website.
 
-This project aims to explore how the Covid-19 pandemic has impacted the housing market by focusing on comparing the sales price across NYC. The project will track how the waves of Covid-19 cases affected the price fluctuations by conducting data analysis and illustrating the results.
+This project aims to explore how the Covid-19 pandemic has impacted the housing market by focusing on comparing the sales price across NYC. The project will track how the waves of Covid-19 cases affected the price fluctuations by conducting data analysis on quarterly tabular, spatial and text data, with illustrations.
 
 Research Questions:
 * How has Covid-19 affected the housing market via housing prices over time?

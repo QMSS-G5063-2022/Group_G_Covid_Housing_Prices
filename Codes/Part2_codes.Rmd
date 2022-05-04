@@ -1,0 +1,330 @@
+---
+title: "Part_two_Mapping"
+author: "Mandi Lee"
+date: "4/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+covid <- read.csv("quarterly_zipcode.csv")
+head(covid)
+```
+
+```{r}
+#fixing col names
+names(covid) = gsub(pattern = "Sum.of.CASERATE_", replacement = "", x = names(covid))
+head(covid)
+
+```
+```{r}
+covid <- t(covid)
+write.csv(covid, "Covid_quarterly_zipcode_transposed.csv", row.names=TRUE)
+```
+
+
+
+
+```{r}
+covid <- read.csv("Covid_quarterly_zipcode.csv")
+head(covid)
+```
+
+
+
+```{r}
+house<- read.csv("Sales_quarterly_zipcode.csv")
+```
+
+
+```{r}
+head(house)
+```
+
+```{r}
+Covid_house <- merge(covid, house, by="Zipcode")
+View(Covid_house)
+```
+```{r}
+map_data <- read.csv("zip.csv")
+```
+
+
+```{r}
+library(dplyr)
+names(map_data)[1]<-'Zipcode'
+data <- merge(Covid_house, map_data, by="Zipcode")
+
+head(data)
+
+```
+```{r}
+write.csv(data, "merged_mapping.csv", row.names=TRUE)
+```
+
+```{r}
+data <- read.csv("merged_mapping.csv")
+head(data)
+```
+
+
+## Mapping with shapefiles
+
+```{r}
+
+library(rgdal)
+nyc_spdf = readOGR(dsn="./shapefiles", verbose=FALSE)
+
+```
+
+
+
+```{r}
+library(leaflet)
+leaflet() %>% addTiles() %>% 
+  addPolygons(data=nyc_spdf)
+```
+## Mapping with geo json
+```{r}
+nyc <- readOGR("MODZCTA_2010_WGS1984.geo.json", verbose = FALSE)
+```
+
+
+```{r}
+library(broom)
+
+nyc_fortified <- tidy(nyc, region="MODZCTA")
+library(ggplot2)
+ggplot()+ geom_point(data=nyc_fortified, aes(x=long, y=lat, group=group), fill="white", color="grey")+ theme_void() + coord_map()
+
+```
+```{r}
+head(nyc_fortified)
+
+nyc_fortified = nyc_fortified %>% 
+  left_join(., data, by = c("id"= "MODZCTA"))
+
+
+```
+```{r}
+head(nyc_fortified)
+```
+
+
+```{r}
+
+Q42020 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q4_20.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 4th quarter (2020)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee") +scale_fill_distiller(name="Covid-19 case rates", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q42020
+ggsave("Covid_Q42020.png")
+```
+simple ver
+```{r}
+covid_1 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q4_20.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2020 Q4") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"), title =element_text(size=8, face='bold', family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+covid_1
+covid_2 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q1_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2021 Q1") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"),title =element_text(size=8, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+covid_3 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q2_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2021 Q2") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"),title =element_text(size=8, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+covid_4 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q3_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2021 Q3") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"),title =element_text(size=8, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+covid_5 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q4_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2021 Q4") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"),title =element_text(size=8, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+covid_6 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q1_22.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="2022 Q1") + theme(legend.title=element_blank()) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, colour="#D2B48C"),title =element_text(size=8, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+```
+
+
+```{r}
+
+Q12021 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q1_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 1st quarter (2021)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee") +scale_fill_distiller(name="Covid-19 case rates", palette = "Spectral") + theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q12021
+ggsave("Covid_Q12021.png")
+```
+
+
+```{r}
+Q22021 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q2_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 2nd quarter (2021)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee" ) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") +theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q22021
+ggsave("Covid_Q22021.png")
+```
+
+```{r}
+Q32021 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q3_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 3rd quarter (2021)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee" ) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") +theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q32021
+ggsave("Covid_Q32021.png")
+
+
+```
+
+
+```{r}
+Q42021 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q4_21.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 4th quarter (2021)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee" ) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") +theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q42021
+ggsave("Covid_Q42021.png")
+
+```
+
+```{r}
+Q12022 <- ggplot()+ 
+  geom_polygon(data=nyc_fortified, aes(fill= as.numeric(Q1_22.covid), x=long, y=lat, group=group)) + theme_void() + coord_map() + labs(title="Covid-19 in NYC", subtitle="Sum of case rates in 1st quarter (2022)", caption="Data: NYC Open Data | QMSS-G5063-2022 Kum Hyun Lee" ) +scale_fill_distiller(name="Covid Cases", palette = "Spectral") +theme(legend.key.size = unit(0.4, "cm"), legend.key.width= unit(0.1, 'cm'), legend.text = element_text(size=6, family="mono", colour="#D2B48C"),title =element_text(size=10, face='bold',family="mono", colour="#D2B48C"),plot.title = element_text(hjust = 0.5, colour="#D2B48C"))
+
+Q12022
+ggsave("Covid_Q12022.png")
+
+
+```
+
+Plotting in one frame 
+```{r}
+install.packages("cowplot")
+library("cowplot")
+```
+
+```{r}
+# install.packages("ggpubr")
+library(ggpubr)
+all_maps <- ggarrange(covid_1, covid_2, covid_3, covid_4, covid_5, covid_6,  ncol=3, nrow=2, common.legend = TRUE, legend="none")
+library(extrafont)
+```
+
+
+```{r}
+annotate_figure(all_maps, top=text_grob("Covid-19 Case rates by quarters (2020-2022)", face="bold", size=10, family="mono", color="tan"), bottom=text_grob("Data: NYC Open Data | QMSS-G5063 Kum Hyun Lee", size=6, family="mono", color="tan"))
+ggsave("covid_all6.png")
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+nyc_spdf
+```
+
+
+
+```{r}
+plot(nyc_spdf)
+```
+
+Merging shapefile with data
+```{r}
+
+nyc_data <- nyc_spdf@data %>% 
+  left_join(data, by = "MODZCTA")
+
+nyc_spdf@data <- nyc_data
+
+
+```
+
+
+
+
+Leaflet
+```{r}
+library(leaflet)
+
+
+
+```
+
+
+ggplot2
+```{r}
+#visualise the numeric data
+library(dplyr)
+library(ggplot2)
+
+nyc_spdf@data$Q4_20.covid <- as.numeric(nyc_spdf@data$Q4_20.covid)
+
+nyc_spdf@data %>% 
+  ggplot(aes(x=as.numeric(Q4_20.covid)))+ geom_histogram(bins=50, fill='#69b3a2', color='white')
+```
+
+
+```{r}
+library(RColorBrewer)
+colors <- brewer.pal(9, "Reds")
+colors <- colorRampPalette(colors)(100)
+
+severity <- cut(nyc_spdf@data$Q4_20.covid, 100)
+colors <- colors[as.numeric(severity)]
+
+before <- plot(nyc_spdf , col=colors ,  bg = "#000000", main = "Fourth Quarter 2020 Covid severity in NYC", cex = 0.5)
+
+before
+```
+```{r}
+library(sp)
+library(RColorBrewer)
+mycolours <- brewer.pal(8, "YlOrRd")
+spplot(nyc_spdf,"Q4_20.covid", par.settings = list(axis.line = list(col ="transparent")), main = "Percentage case rates", cuts = 5, col ="transparent", col.regions = mycolours)
+```
+
+
+
+```{r}
+library(tmap)
+before<- tm_shape(nyc_spdf) + tm_polygons(col='Q4_20.covid', title="Covid cases in 2020 Q4", palette= "Spectral") + tm_scale_bar(position = c("right", "top")) + tm_style("classic")
+
+before
+```
+
+
+```{r}
+after <- tm_shape(nyc_spdf) + tm_polygons(col='Q1_22.covid', title="Covid cases in 2022 Q1", palette= "Spectral") + tm_scale_bar(position = c("right", "top")) + tm_style("classic")
+
+after
+```
+
+
+Leaflet 
+
+```{r}
+nyc_spdf@data$Q4_20.covid <- as.numeric(nyc_spdf@data$Q4_20.covid)
+library(leaflet)
+
+mypalette <- colorNumeric(palette = "viridis", domain=nyc_spdf@data$Q4_20.covid, na.color="transparent")
+mypalette(c(45, 43))
+
+m1 <- leaflet(nyc_spdf) %>% 
+  addTiles() %>% 
+  addPolygons( fillColor = ~mypalette(Q4_20.covid), stroke = FALSE)
+
+```
+```{r}
+nyc_spdf@data %>% 
+  ggplot( aes(x=as.numeric(Q4_20.covid))) + 
+    geom_histogram(bins=20, fill='#69b3a2', color='white') +
+    xlab("Covid case rate") + 
+    theme_bw()
+
+
+

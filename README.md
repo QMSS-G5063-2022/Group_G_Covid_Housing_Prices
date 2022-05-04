@@ -38,5 +38,8 @@ The final section studies the changes of perspective on Covid-19 over time (2020
 * Mapping: [Modified Zip Code Tabulation Areas (MODZCTA)](https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk)
 * Text Analysis: [Tweets](https://github.com/QMSS-G5063-2022/Group_G_Covid_Housing_Prices/tree/main/Part3_data)
 
+The codes we did for data analysis and producing visualizations can be found [here](https://github.com/QMSS-G5063-2022/Group_G_Covid_Housing_Prices/tree/main/Codes)
+The codes used for building the website can be found [here](https://github.com/2hyunie/qmss-dv-group-g)
+
 Our process book that logs our work from start to end can be found [here](https://docs.google.com/document/d/1xeExYWJWVvAeyePif__lbE5q5tvxCoxBYs8WfAIuTLs/edit?usp=sharing)
 - Note: this can only be viewed by LionMail.

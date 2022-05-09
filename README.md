@@ -14,6 +14,8 @@ Research Questions:
 * How has COVID-19 affected the NYC housing market? Are there any regional variations in the housing price fluctuations?
 * How has the overall perspective on Covid-19 changed over time?
 
+The website has been coded using `HTML`, `CSS`, and `JavaScript` from scratch to build a simple, yet user-friendly website.
+
 ## Part 1: Trends in Covid-19 and Sales Price
 
 Part 1 examines Covid-19 rate and sales prices in all five boroughs in NYC from the 3rd quarter of 2020 to the 1st quarter of 2022. `ggplot2` and `ggplotly` in R is used to create the visualizations.

@@ -19,6 +19,7 @@ library(showtext)
 ```
 
 ```{r}
+setwd("/Users/2hyunie/Documents/Git/Part1_data")
 sales <- read_csv("Sales_Price_Monthly.csv",
                   col_names = TRUE,
                   show_col_types = FALSE)
@@ -43,21 +44,6 @@ covid <- covid[order(covid$`Month & Year`), ]
 ```
 
 ```{r}
-max(msales$`Average Sale Price_mean`)
-min(msales$`Average Sale Price_mean`)
-max(mcovid$Rate)
-min(mcovid$Rate)
-```
-
-```{r}
-font_add_google(family="Roboto", "Roboto Mono")
-showtext_auto()
-t <- list(
-  family = "Roboto"
-)
-```
-
-```{r}
 msales <- sales_monthly %>%
   filter(Borough == "Manhattan")
 
@@ -71,10 +57,14 @@ scaleFactor <- max(msales$`Average Sale Price`)/max(mcovid$Rate)
 mplot <- ggplot() +
   geom_bar(data = mcovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
   geom_line(data = msales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  geom_hline(yintercept=1045.623, linetype=2, color="tomato3") +
+  geom_hline(yintercept=2894.88, linetype=2, color="steelblue3") +
   scale_x_yearmon() +
-  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid-19 Rate")) +
   labs(title = "Manhattan Average Sales and Covid-19 Rate",
        x = "Month") +
+  annotate("text", x = 2022.2, y= 1400, label = "Mean Covid Rate", size = 2.5, family = "mono", color="tomato3") +
+  annotate("text", x = 2022.2, y= 2600, label = "Mean Sales", size = 2.5, family = "mono", color="steelblue3") +
   theme_minimal() +
   theme(text = element_text(family = "mono"),
         plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
@@ -83,8 +73,13 @@ mplot <- ggplot() +
         axis.text.y.left = element_text(color="steelblue3"),
         axis.title.y.right = element_text(color="tomato3"),
         axis.text.y.right = element_text(color="tomato3"),
-        legend.position = "none")
+        legend.position = "right")
 mplot
+```
+
+```{r}
+mean(msales$`Average Sale Price_mean`)
+mean(mcovid$Rate)
 ```
 
 ```{r}
@@ -101,10 +96,14 @@ scaleFactor <- max(brsales$`Average Sale Price`)/max(brcovid$Rate)
 brplot <- ggplot() +
   geom_bar(data = brcovid, aes(x = `Month & Year`, y = Rate * scaleFactor), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.03) +
   geom_line(data = brsales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
+  geom_hline(yintercept=1155.772, linetype=2, color="tomato3") +
+  geom_hline(yintercept=1337.523, linetype=2, color="steelblue3") +
   scale_x_yearmon() +
-  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid")) +
+  scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid-19 Rate")) +
   labs(title = "Bronx Average Sales and Covid-19 Rate",
        x = "Month") +
+  annotate("text", x = 2020.78, y= 1000, label = "Mean Covid Rate", size = 2.5, family = "mono", color="tomato3") +
+  annotate("text", x = 2022.2, y= 1500, label = "Mean Sales", size = 2.5, family = "mono", color="steelblue3") +
   theme_minimal() +
   theme(text = element_text(family = "mono"),
         plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
@@ -115,6 +114,11 @@ brplot <- ggplot() +
         axis.text.y.right = element_text(color="tomato3"),
         legend.position = "none")
 brplot
+```
+
+```{r}
+mean(brsales$`Average Sale Price_mean`)
+mean(brcovid$Rate)
 ```
 
 ```{r}
@@ -222,21 +226,21 @@ scaleFactor1 <- max(bsales$`Average Sale Price`)/max(bcovid$Rate)
 
 plots <- ggplot() +
   geom_line(data = bsales, aes(x = `Month & Year`, y = `Average Sale Price`), col = "steelblue3") +
-  geom_line(data = bcovid, aes(x = `Month & Year`, y = Rate * scaleFactor1), col = "tomato3") +
+#  geom_line(data = bcovid, aes(x = `Month & Year`, y = Rate * scaleFactor1), col = "tomato3") +
+  geom_bar(data = bcovid, aes(x = `Month & Year`, y = Rate * scaleFactor1), stat = "identity", fill = "tomato3", color = "tomato3", width = 0.01) +
   scale_x_yearmon() +
   scale_y_continuous(name = "Sales (in $1,000)", sec.axis = sec_axis(~./scaleFactor, name = "Covid Rate")) +
   labs(title = "Average Sales and Covid-19 Rate in NYC",
        subtitle = "For each Borough",
        x = "Month") +
   theme_minimal() +
-  theme(text = element_text(family = "mono"),
-        plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
+  theme(plot.title = element_text(face = "bold", size = 13, hjust = 0.5),
         plot.subtitle = element_text(face = "italic", hjust = 0.5),
         axis.title = element_text(face = "bold", size = 10),
         axis.title.y.left = element_text(color="steelblue3"),
         axis.text.y = element_blank(),
         axis.title.y.right = element_text(color="tomato3"),
-        legend.position = "none")
+        legend.position = "right")
 plots <- plots + facet_grid(rows = vars(Borough), scales = "free")
 plots
 ```
@@ -258,7 +262,8 @@ coviddt <- datatable(covid1, options = list(pageLength = 5))
 ```
 
 ```{r}
-interactive <- ggplotly(plots)
+interactive <- ggplotly(plots) %>%
+  layout(font = list(family = "futura"))
 interactive
 ```
 
